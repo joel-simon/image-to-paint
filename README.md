@@ -4,20 +4,23 @@ Generate a series of brushstrokes from an image. There are several parameters to
 
 This is a cleanup of an old school project from 2012. There are many code and methode improvments to be made.
 
-Examples
+Requires pygame and PIL
+
+## Examples
 
 ```
- ./imageToPaint apple.jpg apple_out.jpg --brushes 2 4 
-```
-
-
-```
- ./imageToPaint humanoid.png humanoid_out.jpg --brushes 4 8
-
+ ./imageToPaint example/apple.jpg apple_out.jpg --brushes 2 4 
 ```
 
 
-Many other options
+```
+ ./imageToPaint example/humanoid.jpg humanoid_out.jpg --brushes 4 8
+
+```
+
+
+## Other options
+./imageToPaint -h
 
 ```
 usage: imageToPaint    [-h] [--brushes BRUSHES [BRUSHES ...]]
