@@ -416,7 +416,7 @@ def main(config):
     print("Completed: image uses ", strokes_used, " brushstrokes.")
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("in", help="Path to input image.")
     parser.add_argument("out", help="Path to where to save output image.")
 
