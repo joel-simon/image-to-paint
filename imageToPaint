@@ -227,10 +227,10 @@ def colorDistance(a, b):
     a_p = rgb_to_lab(a)
     b_p = rgb_to_lab(b)
 
-    return difference(z_p, b_p)
+    return difference(a_p, b_p)
 
-def closestColor(hsv_colors, s):
-    return min(hsv_colors, key=lambda c: colorDistance(c, s))
+def closestColor(colors, s):
+    return min(colors, key=lambda c: colorDistance(c, s))
 
 def areaError(x_0, y_0, array, grid):
     s = 0
@@ -355,7 +355,7 @@ def paintLayer(canvas, image, r, config):
 
     return strokes
 
-def place_strokes(strokes, window, gcode_out, config, width, height):
+def output_strokes(strokes, window, gcode_out, config, width, height):
     """ Take the strokes and write them to the pygame canvas and gcode file.
     """
     if gcode_out:
@@ -366,6 +366,15 @@ def place_strokes(strokes, window, gcode_out, config, width, height):
 
     xScale = config['gc_width'] / width
     yScale = config['gc_height'] / height
+
+    if config['colors'] != ['all']:
+        colors = []
+        for color_str in config['colors']:
+            color_num = int(color_str, 16)
+            red = (color_num >> 16) & 255
+            green = (color_num >> 8) & 255
+            blue = color_num & 2555
+            colors.append((red, green, blue))
 
     for stroke in strokes:
         if len(stroke.move_list) < config['min_len']:
@@ -382,7 +391,7 @@ def place_strokes(strokes, window, gcode_out, config, width, height):
                         ' Y'+ str(stroke.move_list[p][1]*yScale)[:6]+'\r')
 
         if config['colors'] != ['all']:
-            stroke.color = closestColor(config['colors'], stroke.color)
+            stroke.color = closestColor(colors, stroke.color)
 
         pygame.draw.lines(window, stroke.color, False, stroke.move_list, stroke.radius)
 
@@ -406,7 +415,7 @@ def main(config):
             gcode_out = os.path.join(out_dir, 'strokes_%i.txt'%r)
 
         strokes = paintLayer(canvas, image, r, config)
-        place_strokes(strokes, window, gcode_out, config, width, height)
+        output_strokes(strokes, window, gcode_out, config, width, height)
         strokes_used += len(strokes)
 
         print("Completed brush size %i - %i strokes used" % (r, len(strokes)))
@@ -425,7 +434,7 @@ if __name__ == "__main__":
     parser.add_argument("--max_len", default=60, help="Maximum stroke Length.", type=int)
     parser.add_argument("--min_len", default=5, help="Maximum stroke Length.", type=int)
     parser.add_argument("--f_grid", default=6, help="How spaced apart new strokes will be, 1 = 1*radius_stroke apart.", type=int)
-    parser.add_argument("--colors", default=["all"], nargs='+', help="Use a limited color palate.")
+    parser.add_argument("--colors", default=["all"], nargs='+', help="Use a limited color palate with color hex codes (ex: '--color 000000 ff0000') to only use black and red")
     parser.add_argument("--lightdark", default=True, help="Paint brush strokes in increasing brightness.", type=bool)
     parser.add_argument("--t", default=10.0, help="Threshold to create a new stroke.", type=float)
     parser.add_argument("--f_l", default=0.75, help="Higher values will result in longer, less acurate brushstrokes.", type=float)
